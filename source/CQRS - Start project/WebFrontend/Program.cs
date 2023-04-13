@@ -5,9 +5,9 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
-builder.Services.AddTransient<IOrderService, OrderService>();
 builder.Services.AddSingleton<IOrderRepository, OrderRepository>();
-
+builder.Services.AddTransient<IOrderService_WriteSide, OrderService_WriteSide>();
+builder.Services.AddTransient<IOrderService_ReadSide, OrderService_ReadSide>();
 
 var app = builder.Build();
 

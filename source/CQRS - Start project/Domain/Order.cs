@@ -2,7 +2,7 @@
 
 public class Order
 {
-    public int Id { get; set; }
+    public Guid Id { get; set; }
     public OrderState orderState { get; set; } = OrderState.Unknown;
     public int CustomerId { get; set; }
     public string CustomerName { get; set; }
@@ -12,7 +12,7 @@ public class Order
 
 public class OrderLine
 {
-    public int Id { get; set; }
+    public Guid Id { get; set; }
     public int ProductId { get; set; }
     public string Name { get; set; }
     public decimal Price { get; set; }

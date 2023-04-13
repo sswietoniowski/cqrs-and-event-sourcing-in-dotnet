@@ -3,84 +3,86 @@ using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 using WebFrontend.Models;
 
-namespace WebFrontend.Controllers
+namespace WebFrontend.Controllers;
+
+public class HomeController : Controller
 {
-    public class HomeController : Controller
+    private readonly ILogger<HomeController> _logger;
+    private readonly IOrderService_WriteSide _orderServiceWriteSide;
+    private readonly IOrderService_ReadSide _orderServiceReadSide;
+
+    public HomeController(ILogger<HomeController> logger, IOrderService_WriteSide orderServiceWriteSide, IOrderService_ReadSide orderServiceReadSide)
     {
-        private readonly ILogger<HomeController> _logger;
-        private readonly IOrderService orderService;
+        _logger = logger;
+        _orderServiceWriteSide = orderServiceWriteSide;
+        _orderServiceReadSide = orderServiceReadSide;
+    }
 
-        public HomeController(ILogger<HomeController> logger, IOrderService orderService)
-        {
-            _logger = logger;
-            this.orderService = orderService;
-        }
+    public IActionResult Index()
+    {
+        return View();
+    }
 
-        public IActionResult Index()
-        {
-            return View();
-        }
+    public IActionResult Privacy()
+    {
+        return View();
+    }
 
-        public IActionResult Privacy()
-        {
-            return View();
-        }
+    [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+    public IActionResult Error()
+    {
+        return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+    }
 
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
-        {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
-        }
+    public IActionResult CreateNewOrder()
+    {
+        return View(new CreateOrderModel());
+    }
 
-        public IActionResult CreateNewOrder()
-        {
-            return View(new CreateOrderModel());
-        }
+    [HttpPost]
+    public IActionResult CreateNewOrder(int CustomerId, string CustomerName)
+    {
+        var orderId = Guid.NewGuid();
+        _orderServiceWriteSide.CreateOrder(orderId, CustomerId, CustomerName);
 
-        [HttpPost]
-        public IActionResult CreateNewOrder(int CustomerId, string CustomerName)
-        {
-            int orderId = orderService.CreateOrder(CustomerId, CustomerName);
+        return RedirectToAction("OrderDetails", new { id = orderId });
+    }
 
-            return RedirectToAction("OrderDetails", new { id = orderId });
-        }
+    [HttpPost]
+    public IActionResult CancelOrder(Guid OrderId)
+    {
+        _orderServiceWriteSide.UpdateOrderState(OrderId, OrderState.cancel);
 
-        [HttpPost]
-        public IActionResult CancelOrder(int OrderId)
-        {
-            orderService.UpdateOrderState(OrderId, OrderState.cancel);
+        return RedirectToAction("OrderDetails", new { id = OrderId });
+    }
 
-            return RedirectToAction("OrderDetails", new { id = OrderId });
-        }
+    [HttpPost]
+    public IActionResult DeleteOrderLine(Guid orderId, Guid orderLineId)
+    {
+        _orderServiceWriteSide.DeleteOrderLine(orderId, orderLineId);
 
-        [HttpPost]
-        public IActionResult DeleteOrderLine(int orderId, int orderLineId)
-        {
-            orderService.DeleteOrderLine(orderId, orderLineId);
+        return RedirectToAction("OrderDetails", new { id = orderId });
+    }
 
-            return RedirectToAction("OrderDetails", new { id = orderId });
-        }
+    [HttpPost]
+    public IActionResult AddOrderLine(Guid orderId, OrderLine orderLine)
+    {
+        _orderServiceWriteSide.AddOrderLine(orderId, orderLine);
 
-        [HttpPost]
-        public IActionResult AddOrderLine(int orderId, OrderLine orderLine)
-        {
-            orderService.AddOrderLine(orderId, orderLine);
+        return RedirectToAction("OrderDetails", new { id = orderId });
+    }
 
-            return RedirectToAction("OrderDetails", new { id = orderId });
-        }
+    public IActionResult OrderDetails(Guid id)
+    {
+        var order = _orderServiceReadSide.LoadOrder(id);
 
-        public IActionResult OrderDetails(int id)
-        {
-            var order = orderService.LoadOrder(id);
+        return View(order);
+    }
 
-            return View(order);
-        }
+    public IActionResult ListAllOrders()
+    {
+        var orders = _orderServiceReadSide.LoadAllOrders();
 
-        public IActionResult ListAllOrders()
-        {
-            var orders = orderService.LoadAllOrders();
-
-            return View(orders);
-        }
+        return View(orders);
     }
 }

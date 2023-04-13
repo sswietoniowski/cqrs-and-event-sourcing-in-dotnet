@@ -3,21 +3,24 @@
 
 public interface IOrderRepository
 {
-    int Insert(Order order);
-    void Update(int orderId, Order order);
-    Order Load(int orderId);
+    // Commands
+    void Insert(Guid orderId, Order order);
+    void Update(Guid orderId, Order order);
+
+    // Queries
+    Order Load(Guid orderId);
     List<Order> LoadAllOrders();
 }
 
 public class OrderRepository : IOrderRepository
 {
-    private Dictionary<int, Order> ordersDb = new();
+    private Dictionary<Guid, Order> ordersDb = new();
 
     public OrderRepository()
     {
         var order1 = new Order()
         {
-            Id = 1,
+            Id = Guid.NewGuid(),
             CustomerId = 1001,
             CustomerName = "Bob",
             orderState = OrderState.New,
@@ -25,7 +28,7 @@ public class OrderRepository : IOrderRepository
             {
                 new OrderLine()
                 {
-                    Id = 1,
+                    Id = Guid.NewGuid(),
                     Name = "Widget A",
                     ProductId = 101,
                     Price = 5.95m,
@@ -33,7 +36,7 @@ public class OrderRepository : IOrderRepository
                 },
                 new OrderLine()
                 {
-                    Id = 2,
+                    Id = Guid.NewGuid(),
                     Name = "MegaMax B",
                     ProductId = 102,
                     Price = 24.95m,
@@ -44,7 +47,7 @@ public class OrderRepository : IOrderRepository
 
         var order2 = new Order()
         {
-            Id = 2,
+            Id = Guid.NewGuid(),
             CustomerId = 1002,
             CustomerName = "Alice",
             orderState = OrderState.Paid,
@@ -52,7 +55,7 @@ public class OrderRepository : IOrderRepository
             {
                 new OrderLine()
                 {
-                    Id = 3,
+                    Id = Guid.NewGuid(),
                     Name = "SuperMax",
                     ProductId = 103,
                     Price = 85.95m,
@@ -60,7 +63,7 @@ public class OrderRepository : IOrderRepository
                 },
                 new OrderLine()
                 {
-                    Id = 4,
+                    Id = Guid.NewGuid(),
                     Name = "MiniMax",
                     ProductId = 104,
                     Price = 19.95m,
@@ -71,7 +74,7 @@ public class OrderRepository : IOrderRepository
 
         var order3 = new Order()
         {
-            Id = 3,
+            Id = Guid.NewGuid(),
             CustomerId = 1003,
             CustomerName = "Joe",
             orderState = OrderState.cancel,
@@ -79,7 +82,7 @@ public class OrderRepository : IOrderRepository
             {
                 new OrderLine()
                 {
-                    Id = 5,
+                    Id = Guid.NewGuid(),
                     Name = "SuperMax",
                     ProductId = 103,
                     Price = 85.95m,
@@ -87,7 +90,7 @@ public class OrderRepository : IOrderRepository
                 },
                 new OrderLine()
                 {
-                    Id = 6,
+                    Id = Guid.NewGuid(),
                     Name = "MiniMax",
                     ProductId = 106,
                     Price = 29.95m,
@@ -101,17 +104,14 @@ public class OrderRepository : IOrderRepository
         ordersDb.Add(order3.Id, order3);
     }
 
-    public int Insert(Order order)
+    public void Insert(Guid orderId, Order order)
     {
-        int newOrderId = ordersDb.Count() + 1;
-        order.Id = newOrderId;
+        order.Id = orderId;
 
-        ordersDb.Add(newOrderId, order);
-
-        return newOrderId;
+        ordersDb.Add(orderId, order);
     }
 
-    public Order Load(int orderId)
+    public Order Load(Guid orderId)
     {
         return ordersDb[orderId];
     }
@@ -121,7 +121,7 @@ public class OrderRepository : IOrderRepository
         return ordersDb.Values.ToList();
     }
 
-    public void Update(int orderId, Order order)
+    public void Update(Guid orderId, Order order)
     {
         ordersDb[orderId] = order;
     }

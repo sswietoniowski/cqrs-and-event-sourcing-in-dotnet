@@ -1,8 +1,7 @@
-﻿namespace WebFrontend.Models
+﻿namespace WebFrontend.Models;
+
+public class CreateOrderModel
 {
-    public class CreateOrderModel
-    {
-        public int CustomerId { get; set; }
-        public string CustomerName { get; set; }
-    }
+    public int CustomerId { get; set; }
+    public string CustomerName { get; set; }
 }
