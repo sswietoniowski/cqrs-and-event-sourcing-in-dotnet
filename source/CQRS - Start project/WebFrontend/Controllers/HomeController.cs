@@ -1,4 +1,5 @@
 ﻿using Domain;
+using Domain.WriteSide;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 using WebFrontend.Models;
@@ -43,7 +44,17 @@ public class HomeController : Controller
     public IActionResult CreateNewOrder(int CustomerId, string CustomerName)
     {
         var orderId = Guid.NewGuid();
-        _orderServiceWriteSide.CreateOrder(orderId, CustomerId, CustomerName);
+
+        var createOrder = new CreateOrder()
+        {
+            Id = orderId,
+            CustomerId = CustomerId,
+            CustomerName = CustomerName
+        };
+
+        var writeSide = (IHandleCommand<CreateOrder>)_orderServiceWriteSide;
+
+        writeSide.Handle(createOrder);
 
         return RedirectToAction("OrderDetails", new { id = orderId });
     }
@@ -51,7 +62,14 @@ public class HomeController : Controller
     [HttpPost]
     public IActionResult CancelOrder(Guid OrderId)
     {
-        _orderServiceWriteSide.UpdateOrderState(OrderId, OrderState.cancel);
+        var cancelOrder = new CancelOrder()
+        {
+            Id = OrderId
+        };
+
+        var writeSide = (IHandleCommand<CancelOrder>)_orderServiceWriteSide;
+
+        writeSide.Handle(cancelOrder);
 
         return RedirectToAction("OrderDetails", new { id = OrderId });
     }
@@ -59,7 +77,15 @@ public class HomeController : Controller
     [HttpPost]
     public IActionResult DeleteOrderLine(Guid orderId, Guid orderLineId)
     {
-        _orderServiceWriteSide.DeleteOrderLine(orderId, orderLineId);
+        var deleteOrderLine = new DeleteOrderLine()
+        {
+            Id = orderId,
+            OrderLineId = orderLineId
+        };
+
+        var writeSide = (IHandleCommand<DeleteOrderLine>)_orderServiceWriteSide;
+
+        writeSide.Handle(deleteOrderLine);
 
         return RedirectToAction("OrderDetails", new { id = orderId });
     }
@@ -67,7 +93,15 @@ public class HomeController : Controller
     [HttpPost]
     public IActionResult AddOrderLine(Guid orderId, OrderLine orderLine)
     {
-        _orderServiceWriteSide.AddOrderLine(orderId, orderLine);
+        var addOrderLine = new AddOrderLine()
+        {
+            Id = orderId,
+            OrderLine = orderLine
+        };
+
+        var writeSide = (IHandleCommand<AddOrderLine>)_orderServiceWriteSide;
+
+        writeSide.Handle(addOrderLine);
 
         return RedirectToAction("OrderDetails", new { id = orderId });
     }

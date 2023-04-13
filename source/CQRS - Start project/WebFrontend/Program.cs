@@ -1,4 +1,5 @@
 using Domain;
+using Domain.WriteSide;
 
 var builder = WebApplication.CreateBuilder(args);
 
