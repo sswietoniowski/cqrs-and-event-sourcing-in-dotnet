@@ -9,14 +9,14 @@ namespace WebFrontend.Controllers;
 public class HomeController : Controller
 {
     private readonly ILogger<HomeController> _logger;
-    private readonly IOrderService_WriteSide _orderServiceWriteSide;
-    private readonly IOrderService_ReadSide _orderServiceReadSide;
+    private readonly IWriteService _writeService;
+    private readonly IOrderServiceReadSide _orderServiceReadSide;
 
-    public HomeController(ILogger<HomeController> logger, IOrderService_WriteSide orderServiceWriteSide, IOrderService_ReadSide orderServiceReadSide)
+    public HomeController(ILogger<HomeController> logger, IWriteService writeService, IOrderServiceReadSide orderServiceReadSide)
     {
-        _logger = logger;
-        _orderServiceWriteSide = orderServiceWriteSide;
-        _orderServiceReadSide = orderServiceReadSide;
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        _writeService = writeService ?? throw new ArgumentNullException(nameof(writeService));
+        _orderServiceReadSide = orderServiceReadSide ?? throw new ArgumentNullException(nameof(orderServiceReadSide));
     }
 
     public IActionResult Index()
@@ -41,51 +41,39 @@ public class HomeController : Controller
     }
 
     [HttpPost]
-    public IActionResult CreateNewOrder(int CustomerId, string CustomerName)
+    public IActionResult CreateNewOrder(int customerId, string customerName)
     {
         var orderId = Guid.NewGuid();
 
-        var createOrder = new CreateOrder()
+        _writeService.HandleCommand(new CreateOrder()
         {
             Id = orderId,
-            CustomerId = CustomerId,
-            CustomerName = CustomerName
-        };
-
-        var writeSide = (IHandleCommand<CreateOrder>)_orderServiceWriteSide;
-
-        writeSide.Handle(createOrder);
+            CustomerId = customerId,
+            CustomerName = customerName
+        });
 
         return RedirectToAction("OrderDetails", new { id = orderId });
     }
 
     [HttpPost]
-    public IActionResult CancelOrder(Guid OrderId)
+    public IActionResult CancelOrder(Guid orderId)
     {
-        var cancelOrder = new CancelOrder()
+        _writeService.HandleCommand(new CancelOrder()
         {
-            Id = OrderId
-        };
+            Id = orderId
+        });
 
-        var writeSide = (IHandleCommand<CancelOrder>)_orderServiceWriteSide;
-
-        writeSide.Handle(cancelOrder);
-
-        return RedirectToAction("OrderDetails", new { id = OrderId });
+        return RedirectToAction("OrderDetails", new { id = orderId });
     }
 
     [HttpPost]
     public IActionResult DeleteOrderLine(Guid orderId, Guid orderLineId)
     {
-        var deleteOrderLine = new DeleteOrderLine()
+        _writeService.HandleCommand(new DeleteOrderLine()
         {
             Id = orderId,
             OrderLineId = orderLineId
-        };
-
-        var writeSide = (IHandleCommand<DeleteOrderLine>)_orderServiceWriteSide;
-
-        writeSide.Handle(deleteOrderLine);
+        });
 
         return RedirectToAction("OrderDetails", new { id = orderId });
     }
@@ -93,15 +81,11 @@ public class HomeController : Controller
     [HttpPost]
     public IActionResult AddOrderLine(Guid orderId, OrderLine orderLine)
     {
-        var addOrderLine = new AddOrderLine()
+        _writeService.HandleCommand(new AddOrderLine()
         {
             Id = orderId,
             OrderLine = orderLine
-        };
-
-        var writeSide = (IHandleCommand<AddOrderLine>)_orderServiceWriteSide;
-
-        writeSide.Handle(addOrderLine);
+        });
 
         return RedirectToAction("OrderDetails", new { id = orderId });
     }

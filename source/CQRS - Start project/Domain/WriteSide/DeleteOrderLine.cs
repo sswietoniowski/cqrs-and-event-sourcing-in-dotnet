@@ -1,8 +1,7 @@
-﻿namespace Domain.WriteSide
+﻿namespace Domain.WriteSide;
+
+public class DeleteOrderLine : ICommand
 {
-    public class DeleteOrderLine : ICommand
-    {
-        public Guid Id { get; set; }
-        public Guid OrderLineId { get; set; }
-    }
+    public Guid Id { get; set; }
+    public Guid OrderLineId { get; set; }
 }

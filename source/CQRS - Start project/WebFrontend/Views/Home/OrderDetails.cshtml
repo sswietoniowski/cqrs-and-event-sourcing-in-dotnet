@@ -11,7 +11,7 @@
     </tr>
     <tr>
         <td>State:</td>
-        <td>@Model.orderState</td>
+        <td>@Model.OrderState</td>
     </tr>
     <tr>
         <td>Customer id:</td>
@@ -42,7 +42,7 @@
 
     </tr>
 
-    @foreach (var orderLine in Model.orderLines)
+    @foreach (var orderLine in Model.OrderLines)
     {
         <tr>
             <td>@orderLine.Id</td>
@@ -91,7 +91,7 @@
 <br />
 <br />
 
-@if (@Model.orderState == Domain.OrderState.New)
+@if (@Model.OrderState == Domain.OrderState.New)
 {
     <h4>Cancel order</h4>
     <form asp-action="CancelOrder">

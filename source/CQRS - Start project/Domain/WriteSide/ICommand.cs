@@ -1,7 +1,6 @@
-﻿namespace Domain.WriteSide
+﻿namespace Domain.WriteSide;
+
+public interface ICommand
 {
-    public interface ICommand
-    {
-        public Guid Id { get; set; }
-    }
+    public Guid Id { get; set; }
 }

@@ -1,6 +1,6 @@
 ﻿namespace Domain;
 
-public interface IOrderService_ReadSide
+public interface IOrderServiceReadSide
 {
     // Queries
     Order LoadOrder(Guid orderId);

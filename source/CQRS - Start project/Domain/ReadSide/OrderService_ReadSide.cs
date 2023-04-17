@@ -1,17 +1,17 @@
 ﻿namespace Domain;
 
-public class OrderService_ReadSide : IOrderService_ReadSide
+public class OrderServiceReadSide : IOrderServiceReadSide
 {
-    private readonly IOrderRepository repository;
+    private readonly IOrderRepository _repository;
 
-    public OrderService_ReadSide(IOrderRepository repository)
+    public OrderServiceReadSide(IOrderRepository repository)
     {
-        this.repository = repository;
+        this._repository = repository;
     }
 
     public Order LoadOrder(Guid orderId)
     {
-        var order = repository.Load(orderId);
+        var order = _repository.Load(orderId);
 
         order.OrderValue = CalculateOrderValue(order);
 
@@ -20,14 +20,14 @@ public class OrderService_ReadSide : IOrderService_ReadSide
 
     public List<OrderSummary> LoadAllOrders()
     {
-        var orders = repository.LoadAllOrders();
+        var orders = _repository.LoadAllOrders();
 
         var orderSummaryList = orders.Select(o => new OrderSummary()
         {
             Id = o.Id,
             CustomerId = o.CustomerId,
             CustomerName = o.CustomerName,
-            orderState = o.orderState,
+            OrderState = o.OrderState,
             OrderValue = CalculateOrderValue(o)
         }
         ).ToList();
@@ -39,7 +39,7 @@ public class OrderService_ReadSide : IOrderService_ReadSide
     private decimal CalculateOrderValue(Order order)
     {
         decimal totalValue = 0;
-        foreach (var line in order.orderLines)
+        foreach (var line in order.OrderLines)
         {
             totalValue += line.Price * line.Quantity;
         }

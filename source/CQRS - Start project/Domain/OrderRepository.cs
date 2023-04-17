@@ -14,7 +14,7 @@ public interface IOrderRepository
 
 public class OrderRepository : IOrderRepository
 {
-    private Dictionary<Guid, Order> ordersDb = new();
+    private Dictionary<Guid, Order> _ordersDb = new();
 
     public OrderRepository()
     {
@@ -23,8 +23,8 @@ public class OrderRepository : IOrderRepository
             Id = Guid.NewGuid(),
             CustomerId = 1001,
             CustomerName = "Bob",
-            orderState = OrderState.New,
-            orderLines = new()
+            OrderState = OrderState.New,
+            OrderLines = new()
             {
                 new OrderLine()
                 {
@@ -50,8 +50,8 @@ public class OrderRepository : IOrderRepository
             Id = Guid.NewGuid(),
             CustomerId = 1002,
             CustomerName = "Alice",
-            orderState = OrderState.Paid,
-            orderLines = new()
+            OrderState = OrderState.Paid,
+            OrderLines = new()
             {
                 new OrderLine()
                 {
@@ -77,8 +77,8 @@ public class OrderRepository : IOrderRepository
             Id = Guid.NewGuid(),
             CustomerId = 1003,
             CustomerName = "Joe",
-            orderState = OrderState.cancel,
-            orderLines = new()
+            OrderState = OrderState.Cancel,
+            OrderLines = new()
             {
                 new OrderLine()
                 {
@@ -99,30 +99,30 @@ public class OrderRepository : IOrderRepository
             }
         };
 
-        ordersDb.Add(order1.Id, order1);
-        ordersDb.Add(order2.Id, order2);
-        ordersDb.Add(order3.Id, order3);
+        _ordersDb.Add(order1.Id, order1);
+        _ordersDb.Add(order2.Id, order2);
+        _ordersDb.Add(order3.Id, order3);
     }
 
     public void Insert(Guid orderId, Order order)
     {
         order.Id = orderId;
 
-        ordersDb.Add(orderId, order);
+        _ordersDb.Add(orderId, order);
     }
 
     public Order Load(Guid orderId)
     {
-        return ordersDb[orderId];
+        return _ordersDb[orderId];
     }
 
     public List<Order> LoadAllOrders()
     {
-        return ordersDb.Values.ToList();
+        return _ordersDb.Values.ToList();
     }
 
     public void Update(Guid orderId, Order order)
     {
-        ordersDb[orderId] = order;
+        _ordersDb[orderId] = order;
     }
 }

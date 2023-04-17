@@ -1,8 +1,7 @@
-﻿namespace Domain.WriteSide
+﻿namespace Domain.WriteSide;
+
+public class AddOrderLine : ICommand
 {
-    public class AddOrderLine : ICommand
-    {
-        public Guid Id { get; set; }
-        public OrderLine OrderLine { get; set; }
-    }
+    public Guid Id { get; set; }
+    public OrderLine OrderLine { get; set; }
 }

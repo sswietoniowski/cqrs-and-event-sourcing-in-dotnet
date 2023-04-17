@@ -1,7 +1,6 @@
-﻿namespace Domain.WriteSide
+﻿namespace Domain.WriteSide;
+
+public interface IHandleCommand<in TCommand> where TCommand : ICommand
 {
-    public interface IHandleCommand<in TCommand> where TCommand : ICommand
-    {
-        void Handle(TCommand command);
-    }
+    void Handle(TCommand command);
 }

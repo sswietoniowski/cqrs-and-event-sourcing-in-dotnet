@@ -1,55 +1,47 @@
 ﻿namespace Domain.WriteSide;
 
-public class OrderService_WriteSide : IOrderService_WriteSide, IHandleCommand<AddOrderLine>, IHandleCommand<DeleteOrderLine>,
-    IHandleCommand<CancelOrder>, IHandleCommand<CreateOrder>
+public class OrderServiceWriteSide :
+    IHandleCommand<CreateOrder>,
+    IHandleCommand<AddOrderLine>,
+    IHandleCommand<CancelOrder>,
+    IHandleCommand<DeleteOrderLine>
 {
-    private readonly IOrderRepository repository;
+    private readonly IOrderRepository _repository;
 
-    public OrderService_WriteSide(IOrderRepository repository)
+    public OrderServiceWriteSide(IOrderRepository repository)
     {
-        this.repository = repository;
+        this._repository = repository;
     }
 
     public void Handle(AddOrderLine command)
     {
-        var order = repository.Load(command.Id);
+        var order = _repository.Load(command.Id);
+
         var orderLineId = Guid.NewGuid();
         command.OrderLine.Id = orderLineId;
-        order.orderLines.Add(command.OrderLine);
-    }
+        order.OrderLines.Add(command.OrderLine);
 
-    public void CreateOrder(Guid orderId, int customerId, string customerName)
-    {
-        var order = new Order()
-        {
-            Id = orderId,
-            CustomerId = customerId,
-            CustomerName = customerName,
-            orderState = OrderState.New,
-            orderLines = new List<OrderLine>()
-        };
-
-        repository.Insert(orderId, order);
+        _repository.Update(command.Id, order);
     }
 
     public void Handle(DeleteOrderLine command)
     {
-        var order = repository.Load(command.Id);
+        var order = _repository.Load(command.Id);
 
-        var ol = order.orderLines.FirstOrDefault(ol => ol.Id == command.OrderLineId);
+        var ol = order.OrderLines.FirstOrDefault(ol => ol.Id == command.OrderLineId);
         if (ol != null)
-            order.orderLines.Remove(ol);
+            order.OrderLines.Remove(ol);
 
-        repository.Update(command.Id, order);
+        _repository.Update(command.Id, order);
     }
 
     public void Handle(CancelOrder command)
     {
-        var order = repository.Load(command.Id);
+        var order = _repository.Load(command.Id);
 
-        order.orderState = OrderState.cancel;
+        order.OrderState = OrderState.Cancel;
 
-        repository.Update(command.Id, order);
+        _repository.Update(command.Id, order);
     }
 
     public void Handle(CreateOrder command)
@@ -59,17 +51,17 @@ public class OrderService_WriteSide : IOrderService_WriteSide, IHandleCommand<Ad
             Id = command.Id,
             CustomerId = command.CustomerId,
             CustomerName = command.CustomerName,
-            orderState = OrderState.New,
-            orderLines = new List<OrderLine>()
+            OrderState = OrderState.New,
+            OrderLines = new List<OrderLine>()
         };
 
-        repository.Insert(command.Id, order);
+        _repository.Insert(command.Id, order);
     }
 
     private decimal CalculateOrderValue(Order order)
     {
         decimal totalValue = 0;
-        foreach (var line in order.orderLines)
+        foreach (var line in order.OrderLines)
         {
             totalValue = totalValue + line.Price * line.Quantity;
         }
