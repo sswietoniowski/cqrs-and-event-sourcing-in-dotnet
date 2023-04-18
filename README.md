@@ -14,6 +14,9 @@ Tore Nestenius is an independent software consultant and trainer based in Helsin
 
 You can read more about Tore on his [blog](https://nestenius.se/) and his  [company](https://tn-data.se/) website. He is also active on [stack overflow](https://stackoverflow.com/users/68490/tore-nestenius), where he spends time answering questions about C#, OpenID-Connect, IdentityServer, ASP.NET Core, CQRS, and many other topics.
 
+## Usefull resources
 
+Some examples:
 
-
+- [Marten](https://martendb.io/) - .NET Transactional Document DB and Event Store on PostgreSQL,
+- [EventStoreDB](https://www.eventstore.com/eventstoredb) - EventStoreDB is an industrial-strength Event Sourcing database that stores your critical data in streams of immutable events.
