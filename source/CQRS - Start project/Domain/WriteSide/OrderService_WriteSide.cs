@@ -1,6 +1,6 @@
 ﻿namespace Domain.WriteSide;
 
-public class OrderServiceWriteSide :
+public class OrderAggregate : Aggregate,
     IHandleCommand<CreateOrder>,
     IHandleCommand<AddOrderLine>,
     IHandleCommand<CancelOrder>,
@@ -8,7 +8,7 @@ public class OrderServiceWriteSide :
 {
     private readonly IOrderRepository _repository;
 
-    public OrderServiceWriteSide(IOrderRepository repository)
+    public OrderAggregate(IOrderRepository repository)
     {
         this._repository = repository;
     }
