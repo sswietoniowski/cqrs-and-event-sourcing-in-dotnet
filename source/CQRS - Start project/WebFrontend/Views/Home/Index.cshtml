@@ -1,5 +1,5 @@
 ﻿@using Newtonsoft.Json
-@inject Domain.IEventStore eventStore
+@inject IEventStore EventStore
 
 @{
     ViewData["Title"] = "Home Page";
@@ -31,7 +31,7 @@
     </thead>
     <tbody>
 
-    @foreach (var evnt in eventStore.GetAllEvents())
+    @foreach (var evnt in EventStore.GetAllEvents())
     {
         <tr>
             <td>@counter</td>

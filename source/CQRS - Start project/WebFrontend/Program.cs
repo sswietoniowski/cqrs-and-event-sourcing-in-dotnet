@@ -1,4 +1,5 @@
 using Domain;
+using Domain.Events;
 using Domain.WriteSide;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -6,10 +7,8 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
-builder.Services.AddSingleton<IOrderRepository, OrderRepository>();
 builder.Services.AddSingleton<IEventStore, EventStore>();
 builder.Services.AddTransient<IWriteService, WriteService>();
-builder.Services.AddTransient<IOrderServiceReadSide, OrderServiceReadSide>();
 
 var app = builder.Build();
 

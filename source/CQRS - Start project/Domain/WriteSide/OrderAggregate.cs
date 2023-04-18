@@ -7,24 +7,30 @@ public class OrderAggregate : Aggregate,
     IHandleCommand<CreateOrder>,
     IHandleCommand<AddOrderLine>,
     IHandleCommand<CancelOrder>,
-    IHandleCommand<DeleteOrderLine>
+    IHandleCommand<DeleteOrderLine>,
+    IApplyEvent<OrderCreated>,
+    IApplyEvent<OrderLineAdded>,
+    IApplyEvent<OrderCanceled>,
+    IApplyEvent<OrderLineDeleted>
 {
-    private readonly IOrderRepository _repository;
+    private Guid _orderId;
+    private int _customerId;
+    private string _customerName;
+    private OrderState _orderState;
+    private List<OrderLine> _orderLines = new();
 
-    public OrderAggregate(IOrderRepository repository)
+    public OrderAggregate()
     {
-        this._repository = repository;
     }
 
     public IEnumerable<IEvent> Handle(AddOrderLine command)
     {
-        var order = _repository.Load(command.Id);
+        // TODO: Add validation
 
-        var orderLineId = Guid.NewGuid();
-        command.OrderLine.Id = orderLineId;
-        order.OrderLines.Add(command.OrderLine);
-
-        _repository.Update(command.Id, order);
+        if (_orderState == OrderState.Cancel)
+        {
+            throw new Exception("Can't modify cancelled order.");
+        }
 
         yield return new OrderLineAdded()
         {
@@ -35,13 +41,12 @@ public class OrderAggregate : Aggregate,
 
     public IEnumerable<IEvent> Handle(DeleteOrderLine command)
     {
-        var order = _repository.Load(command.Id);
+        // TODO: Add validation
 
-        var ol = order.OrderLines.FirstOrDefault(ol => ol.Id == command.OrderLineId);
-        if (ol != null)
-            order.OrderLines.Remove(ol);
-
-        _repository.Update(command.Id, order);
+        if (_orderState == OrderState.Cancel)
+        {
+            throw new Exception("Can't modify cancelled order.");
+        }
 
         yield return new OrderLineDeleted()
         {
@@ -52,11 +57,7 @@ public class OrderAggregate : Aggregate,
 
     public IEnumerable<IEvent> Handle(CancelOrder command)
     {
-        var order = _repository.Load(command.Id);
-
-        order.OrderState = OrderState.Cancel;
-
-        _repository.Update(command.Id, order);
+        // TODO: Add validation
 
         yield return new OrderCanceled()
         {
@@ -66,16 +67,7 @@ public class OrderAggregate : Aggregate,
 
     public IEnumerable<IEvent> Handle(CreateOrder command)
     {
-        var order = new Order()
-        {
-            Id = command.Id,
-            CustomerId = command.CustomerId,
-            CustomerName = command.CustomerName,
-            OrderState = OrderState.New,
-            OrderLines = new List<OrderLine>()
-        };
-
-        _repository.Insert(command.Id, order);
+        // TODO: Add validation
 
         yield return new OrderCreated()
         {
@@ -94,5 +86,28 @@ public class OrderAggregate : Aggregate,
         }
 
         return totalValue;
+    }
+
+    public void Apply(OrderCreated e)
+    {
+        _orderId = e.Id;
+        _customerId = e.CustomerId;
+        _customerName = e.CustomerName;
+        _orderState = OrderState.New;
+    }
+
+    public void Apply(OrderLineAdded e)
+    {
+        _orderLines.Add(e.OrderLine);
+    }
+
+    public void Apply(OrderCanceled e)
+    {
+        _orderState = OrderState.Cancel;
+    }
+
+    public void Apply(OrderLineDeleted e)
+    {
+        _orderLines.RemoveAll(ol => ol.Id == e.OrderLineId);
     }
 }

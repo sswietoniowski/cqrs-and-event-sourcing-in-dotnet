@@ -11,13 +11,11 @@ public class HomeController : Controller
 {
     private readonly ILogger<HomeController> _logger;
     private readonly IWriteService _writeService;
-    private readonly IOrderServiceReadSide _orderServiceReadSide;
 
-    public HomeController(ILogger<HomeController> logger, IWriteService writeService, IOrderServiceReadSide orderServiceReadSide)
+    public HomeController(ILogger<HomeController> logger, IWriteService writeService)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _writeService = writeService ?? throw new ArgumentNullException(nameof(writeService));
-        _orderServiceReadSide = orderServiceReadSide ?? throw new ArgumentNullException(nameof(orderServiceReadSide));
     }
 
     public IActionResult Index()
@@ -93,14 +91,14 @@ public class HomeController : Controller
 
     public IActionResult OrderDetails(Guid id)
     {
-        var order = _orderServiceReadSide.LoadOrder(id);
+        var order = new Order();
 
         return View(order);
     }
 
     public IActionResult ListAllOrders()
     {
-        var orders = _orderServiceReadSide.LoadAllOrders();
+        var orders = new List<OrderSummary>();
 
         return View(orders);
     }
