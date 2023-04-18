@@ -6,11 +6,13 @@ namespace Domain.WriteSide;
 public class WriteService : IWriteService
 {
     private readonly IOrderRepository _repository;
+    private readonly IEventStore _eventStore;
     private readonly Dictionary<Type, Action<ICommand>> _commandHandlers = new();
 
-    public WriteService(IOrderRepository repository)
+    public WriteService(IOrderRepository repository, IEventStore eventStore)
     {
-        _repository = repository;
+        _repository = repository ?? throw new ArgumentNullException(nameof(repository));
+        _eventStore = eventStore ?? throw new ArgumentNullException(nameof(eventStore));
 
         ScanAssembly();
     }
@@ -47,13 +49,22 @@ public class WriteService : IWriteService
 
         _commandHandlers.Add(typeof(TCommand), c =>
         {
+            var events = _eventStore.GetEventsForAggregate(c.Id).ToList();
+            var eventsLoaded = events.Count;
+
             var newEvents = handler!.Handle((TCommand)c).ToList();
 
             Console.WriteLine("\r\nNew events:");
 
             foreach (var e in newEvents)
             {
+
                 Console.WriteLine(e.ToString());
+            }
+
+            if (newEvents.Any())
+            {
+                _eventStore.SaveEvents(c.Id, eventsLoaded, newEvents);
             }
         });
     }
