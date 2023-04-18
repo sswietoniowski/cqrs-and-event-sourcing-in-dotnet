@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using Domain.WriteSide.Commands;
+using System.Reflection;
 
 namespace Domain.WriteSide;
 
@@ -44,7 +45,17 @@ public class WriteService : IWriteService
     {
         var handler = (THandler)Activator.CreateInstance(typeof(THandler), _repository);
 
-        _commandHandlers.Add(typeof(TCommand), c => { handler!.Handle((TCommand)c); });
+        _commandHandlers.Add(typeof(TCommand), c =>
+        {
+            var newEvents = handler!.Handle((TCommand)c).ToList();
+
+            Console.WriteLine("\r\nNew events:");
+
+            foreach (var e in newEvents)
+            {
+                Console.WriteLine(e.ToString());
+            }
+        });
     }
 
     public void HandleCommand<TCommand>(TCommand command) where TCommand : ICommand

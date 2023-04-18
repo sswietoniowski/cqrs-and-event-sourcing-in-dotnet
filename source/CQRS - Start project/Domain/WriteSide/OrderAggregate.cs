@@ -1,4 +1,7 @@
-﻿namespace Domain.WriteSide;
+﻿using Domain.Events;
+using Domain.WriteSide.Commands;
+
+namespace Domain.WriteSide;
 
 public class OrderAggregate : Aggregate,
     IHandleCommand<CreateOrder>,
@@ -13,7 +16,7 @@ public class OrderAggregate : Aggregate,
         this._repository = repository;
     }
 
-    public void Handle(AddOrderLine command)
+    public IEnumerable<IEvent> Handle(AddOrderLine command)
     {
         var order = _repository.Load(command.Id);
 
@@ -22,9 +25,15 @@ public class OrderAggregate : Aggregate,
         order.OrderLines.Add(command.OrderLine);
 
         _repository.Update(command.Id, order);
+
+        yield return new OrderLineAdded()
+        {
+            Id = command.Id,
+            OrderLine = command.OrderLine
+        };
     }
 
-    public void Handle(DeleteOrderLine command)
+    public IEnumerable<IEvent> Handle(DeleteOrderLine command)
     {
         var order = _repository.Load(command.Id);
 
@@ -33,18 +42,29 @@ public class OrderAggregate : Aggregate,
             order.OrderLines.Remove(ol);
 
         _repository.Update(command.Id, order);
+
+        yield return new OrderLineDeleted()
+        {
+            Id = command.Id,
+            OrderLineId = command.OrderLineId
+        };
     }
 
-    public void Handle(CancelOrder command)
+    public IEnumerable<IEvent> Handle(CancelOrder command)
     {
         var order = _repository.Load(command.Id);
 
         order.OrderState = OrderState.Cancel;
 
         _repository.Update(command.Id, order);
+
+        yield return new OrderCanceled()
+        {
+            Id = command.Id
+        };
     }
 
-    public void Handle(CreateOrder command)
+    public IEnumerable<IEvent> Handle(CreateOrder command)
     {
         var order = new Order()
         {
@@ -56,6 +76,13 @@ public class OrderAggregate : Aggregate,
         };
 
         _repository.Insert(command.Id, order);
+
+        yield return new OrderCreated()
+        {
+            Id = command.Id,
+            CustomerId = command.CustomerId,
+            CustomerName = command.CustomerName
+        };
     }
 
     private decimal CalculateOrderValue(Order order)

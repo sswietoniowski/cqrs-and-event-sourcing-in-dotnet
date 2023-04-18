@@ -1,4 +1,4 @@
-﻿namespace Domain.WriteSide;
+﻿namespace Domain.WriteSide.Commands;
 
 public interface ICommand
 {

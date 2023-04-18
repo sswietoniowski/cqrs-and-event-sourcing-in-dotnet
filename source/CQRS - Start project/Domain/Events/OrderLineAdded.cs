@@ -1,6 +1,6 @@
-﻿namespace Domain.WriteSide;
+﻿namespace Domain.Events;
 
-public class AddOrderLine : ICommand
+public class OrderLineAdded : IEvent
 {
     public Guid Id { get; set; }
     public OrderLine OrderLine { get; set; }

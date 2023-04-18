@@ -1,4 +1,6 @@
-﻿namespace Domain.WriteSide;
+﻿using Domain.WriteSide.Commands;
+
+namespace Domain.WriteSide;
 
 public interface IWriteService
 {
