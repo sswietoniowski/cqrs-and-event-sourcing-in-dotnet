@@ -10,14 +10,14 @@ public class OrderAggregate : Aggregate,
     IHandleCommand<DeleteOrderLine>,
     IApplyEvent<OrderCreated>,
     IApplyEvent<OrderLineAdded>,
-    IApplyEvent<OrderCanceled>,
+    IApplyEvent<OrderCancelled>,
     IApplyEvent<OrderLineDeleted>
 {
     private Guid _orderId;
     private int _customerId;
     private string _customerName;
     private OrderState _orderState;
-    private List<OrderLine> _orderLines = new();
+    private readonly List<OrderLine> _orderLines = new();
 
     public OrderAggregate()
     {
@@ -59,7 +59,7 @@ public class OrderAggregate : Aggregate,
     {
         // TODO: Add validation
 
-        yield return new OrderCanceled()
+        yield return new OrderCancelled()
         {
             Id = command.Id
         };
@@ -77,10 +77,10 @@ public class OrderAggregate : Aggregate,
         };
     }
 
-    private decimal CalculateOrderValue(Order order)
+    private decimal CalculateOrderValue()
     {
         decimal totalValue = 0;
-        foreach (var line in order.OrderLines)
+        foreach (var line in _orderLines)
         {
             totalValue = totalValue + line.Price * line.Quantity;
         }
@@ -101,7 +101,7 @@ public class OrderAggregate : Aggregate,
         _orderLines.Add(e.OrderLine);
     }
 
-    public void Apply(OrderCanceled e)
+    public void Apply(OrderCancelled e)
     {
         _orderState = OrderState.Cancel;
     }
@@ -109,5 +109,18 @@ public class OrderAggregate : Aggregate,
     public void Apply(OrderLineDeleted e)
     {
         _orderLines.RemoveAll(ol => ol.Id == e.OrderLineId);
+    }
+
+    public Order GetOrderQuery()
+    {
+        return new Order()
+        {
+            Id = _orderId,
+            CustomerId = _customerId,
+            CustomerName = _customerName,
+            OrderState = _orderState,
+            OrderLines = _orderLines,
+            OrderValue = CalculateOrderValue()
+        };
     }
 }

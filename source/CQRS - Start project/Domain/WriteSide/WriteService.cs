@@ -85,4 +85,14 @@ public class WriteService : IWriteService
             throw new Exception("No handler found for command: " + typeof(TCommand).Name);
         }
     }
+
+    public TResult QueryAggregate<TAggregate, TResult>(Guid id, Func<TAggregate, TResult> query) where TAggregate : Aggregate, new()
+    {
+        var events = _eventStore.LoadEvents(id).ToList();
+
+        var agg = new TAggregate();
+        agg.ApplyEvents(events);
+
+        return query(agg);
+    }
 }
