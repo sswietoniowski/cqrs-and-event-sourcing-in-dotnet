@@ -19,4 +19,10 @@ You can read more about Tore on his [blog](https://nestenius.se/) and his  [comp
 Some examples:
 
 - [Marten](https://martendb.io/) - .NET Transactional Document DB and Event Store on PostgreSQL,
-- [EventStoreDB](https://www.eventstore.com/eventstoredb) - EventStoreDB is an industrial-strength Event Sourcing database that stores your critical data in streams of immutable events.
+- [EventStoreDB](https://www.eventstore.com/eventstoredb) - EventStoreDB is an industrial-strength Event Sourcing database that stores your critical data in streams of immutable events,
+
+These resources are about event storming (not event sourcing as such :-)), I've added them here for my own use ;-):
+
+- [DevTalk Trio S02E09 – Co to jest event storming](https://devstyle.pl/2019/03/08/devtalk-trio-s02e09-co-to-jest-event-storming/),
+- [Event Storming - dlaczego działa tak dobrze?](https://radekmaziarka.pl/2019/05/11/event-storming-dlaczego-dziala-tak-dobrze/),
+- [DevTalk #110 – O Event Storming z Mariuszem Gil](https://devstyle.pl/2020/02/03/devtalk-110-o-event-storming-z-mariuszem-gil/) [:file_folder:](https://github.com/mariuszgil/awesome-eventstorming).
